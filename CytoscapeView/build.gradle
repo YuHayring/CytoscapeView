@@ -26,7 +26,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildToolsVersion '33.0.0'
 }
@@ -45,4 +45,9 @@ dependencies {
 // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.9.1'
     implementation 'com.github.SDBridge:SDBridgeKotlin:1.0.3'
+
+    // https://mvnrepository.com/artifact/androidx.webkit/webkit
+    implementation 'androidx.webkit:webkit:1.5.0'
+
+
 }
