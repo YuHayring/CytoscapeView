@@ -1,4 +1,4 @@
-package cn.hayring.view
+package cn.hayring.view.cytoscapeview
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,8 +6,11 @@ import android.util.Log
 import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.webkit.WebViewAssetLoader
-import com.housenkui.sdbridgekotlin.Callback
+import cn.hayring.view.BuildConfig
+import cn.hayring.view.cytoscapeview.bean.CyNode
+import cn.hayring.view.cytoscapeview.bean.Node
+import cn.hayring.view.cytoscapeview.bean.SimpleCyNode
+import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
 
@@ -165,13 +168,27 @@ class CytoscapeView: WebView {
         }
     }
 
+    @Deprecated("Only for test")
     fun addTest() {
         //call js Sync function
         bridge.call("addTest", null, null)
     }
 
+    /**
+     * json parser
+     */
+    var gson: Gson = Gson()
 
 
+    /**
+     * add Node
+     */
+    fun addNode(node: Node) {
+        val cyNode = SimpleCyNode(node)
+        val tempString = gson.toJson(cyNode)
+        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
+        bridge.call("add", HashMap(mapData), null)
+    }
 
 
 

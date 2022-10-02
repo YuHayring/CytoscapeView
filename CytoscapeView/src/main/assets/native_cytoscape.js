@@ -13,15 +13,18 @@ function init() {
     console.log('initCore')
     const bridge = window.WebViewJavascriptBridge
     console.log(bridge)
-    bridge.registerHandler('addTest', function(data, responseCallback) {
-                        cy.add({
-                             group: 'nodes',
-                             data: { weight: 75 },
-                             position: { x: 200, y: 200 }
-                         });
-                        //JS gets the data and returns it to the native
-                        responseCallback(result)
-                    });
+//    bridge.registerHandler('addTest', function(data, responseCallback) {
+//                        cy.add({
+//                             group: 'nodes',
+//                             data: { weight: 75 },
+//                             position: { x: 200, y: 200 }
+//                         });
+//                        //JS gets the data and returns it to the native
+//                        responseCallback(result)
+//                    });
+    bridge.registerHandler('add', function(data) {
+            cy.add(data)
+        });
 }
 
 init();
