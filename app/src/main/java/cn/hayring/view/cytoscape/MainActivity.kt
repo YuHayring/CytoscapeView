@@ -3,7 +3,6 @@ package cn.hayring.view.cytoscape
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import cn.hayring.view.cytoscape.databinding.ActivityMainBinding
-import cn.hayring.view.cytoscapeview.bean.Node
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,12 +14,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.addBtn.setOnClickListener {
-            val node = SimpleNode(binding.idInput.text.toString(), binding.nameInput.text.toString())
+            val node = SimpleNode(binding.idInput.text.toString(), binding.nameOrTargetInput.text.toString())
             binding.cytoscapeView.addNode(node)
         }
 
         binding.removeBtn.setOnClickListener {
-            binding.cytoscapeView.removeNode(binding.idInput.text.toString())
+            binding.cytoscapeView.removeElement(binding.idInput.text.toString())
+        }
+
+        binding.addEdgeBtn.setOnClickListener {
+            binding.cytoscapeView.addEdge(SimpleEdge(
+                binding.idInput.text.toString(),
+                binding.sourceInput.text.toString(),
+                binding.nameOrTargetInput.text.toString()
+            ))
+        }
+
+        binding.clear.setOnClickListener {
+            binding.idInput.setText("")
+            binding.sourceInput.setText("")
+            binding.nameOrTargetInput.setText("")
         }
 
     }

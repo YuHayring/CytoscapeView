@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+<!--    <WebView-->
     <cn.hayring.view.cytoscapeview.CytoscapeView
         android:id="@+id/cytoscape_view"
         android:layout_width="match_parent"
@@ -32,22 +33,36 @@
             app:layout_constraintTop_toTopOf="@id/clear"
             />
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/name_input"
+            android:id="@+id/source_input"
             android:minWidth="200dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="name"
+            android:hint="source"
             app:layout_constraintStart_toStartOf="@id/id_input"
-            app:layout_constraintBottom_toBottomOf="@id/clear"
+            app:layout_constraintTop_toBottomOf="@+id/id_input"
+            android:layout_marginTop="10dp"
+
+            />
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/name_or_target_input"
+            android:minWidth="200dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="name or target"
+            app:layout_constraintStart_toStartOf="@id/id_input"
+            app:layout_constraintTop_toBottomOf="@+id/source_input"
+            android:layout_marginTop="10dp"
+
             />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/clear"
             android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="80dp"
+            android:layout_height="0dp"
             android:text="clear"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/name_or_target_input"
             android:layout_marginEnd="30dp"
             />
 
@@ -64,6 +79,7 @@
                 android:id="@+id/add_btn"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_columnWeight="1"
                 android:layout_column="0"
                 android:text="add"
                 android:layout_gravity="center"
@@ -73,8 +89,19 @@
                 android:id="@+id/remove_btn"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_columnWeight="1"
                 android:layout_column="1"
                 android:text="remove"
+                android:layout_gravity="center"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/add_edge_btn"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_column="2"
+                android:text="addEdge"
                 android:layout_gravity="center"
                 />
 

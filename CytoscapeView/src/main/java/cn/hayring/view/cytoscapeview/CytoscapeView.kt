@@ -7,9 +7,7 @@ import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
-import cn.hayring.view.cytoscapeview.bean.CyNode
-import cn.hayring.view.cytoscapeview.bean.Node
-import cn.hayring.view.cytoscapeview.bean.SimpleCyNode
+import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
@@ -191,6 +189,28 @@ class CytoscapeView: WebView {
     }
 
     /**
+     * add Node with position
+     */
+    fun addNode(node: Node, position: Position) {
+        val cyNode = SimpleCyNode(node, position)
+        val tempString = gson.toJson(cyNode)
+        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
+        bridge.call("add", HashMap(mapData), null)
+    }
+
+    /**
+     * add Edge
+     */
+    fun addEdge(edge: Edge) {
+        val cyEdge = SimpleCyEdge(edge)
+        val tempString = gson.toJson(cyEdge)
+        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
+        bridge.call("add", HashMap(mapData), null)
+    }
+
+
+
+    /**
      * remove Node
      */
     fun removeNode(node: Node) {
@@ -203,7 +223,7 @@ class CytoscapeView: WebView {
     /**
      * remove Node
      */
-    fun removeNode(id: String) {
+    fun removeElement(id: String) {
         bridge.call("remove", HashMap<String, Any>().also{ it["id"] = id }, null)
     }
 
