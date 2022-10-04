@@ -15,7 +15,7 @@ interface CyElement {
     /**
      * data
      */
-    val node: Node
+    val data: Node
 
     companion object {
         /**

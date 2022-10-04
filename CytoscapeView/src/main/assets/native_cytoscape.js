@@ -1,8 +1,8 @@
 var cy = cytoscape({
 container: document.getElementById('cytoscape'), // container to render in
-//style: [{ selector: 'node',
-//        css: {'content': 'data('+ getQueryVariable("nodeContentField") +')'}
-//    }],
+style: [{ selector: 'node',
+        css: {'content': 'data(name)'} //show label with "name" value
+    }],
 //pixelRatio: 0.7,
 });
 
@@ -22,9 +22,27 @@ function init() {
 //                        //JS gets the data and returns it to the native
 //                        responseCallback(result)
 //                    });
-    bridge.registerHandler('add', function(data) {
+    bridge.registerHandler('add',
+        //https://js.cytoscape.org/#cy.add
+        function(data) {
             cy.add(data)
-        });
+        }
+    );
+    bridge.registerHandler('remove',
+        function(data, callback) {
+            var elem = cy.$('#' + data.id)
+            if (elem == undefined || elem == null || elem.length == 0) {
+                if (callback != undefined && callback !== null) {
+                    callback(false)
+                }
+            } else {
+                cy.remove(elem)
+                if (callback != undefined && callback !== null) {
+                    callback(true)
+                }
+            }
+        }
+    );
 }
 
 init();

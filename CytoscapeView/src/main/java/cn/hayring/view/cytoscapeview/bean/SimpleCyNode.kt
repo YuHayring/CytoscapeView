@@ -6,6 +6,6 @@ package cn.hayring.view.cytoscapeview.bean
  * @description CyNode simple implement
  */
 class SimpleCyNode(
-    override var node: Node,
+    override var data: Node,
     override var position: Position = Position()
 ) : CyNode

@@ -15,7 +15,7 @@ interface CyNode : CyElement {
     /**
      * data
      */
-    override var node: Node
+    override var data: Node
 
     /**
      * position

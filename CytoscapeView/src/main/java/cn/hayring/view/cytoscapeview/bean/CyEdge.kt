@@ -14,8 +14,8 @@ interface CyEdge : CyElement {
         get() = CyElement.EDGES
 
     /**
-     * 数据
+     * data
      */
-    override var node: Edge
+    override var data: Edge
 
 }

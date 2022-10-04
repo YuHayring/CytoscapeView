@@ -14,12 +14,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.floatingActionButton.setOnClickListener {
-            val node = object : Node {
-                override var id: String = "1"
-
-            }
+        binding.addBtn.setOnClickListener {
+            val node = SimpleNode(binding.idInput.text.toString(), binding.nameInput.text.toString())
             binding.cytoscapeView.addNode(node)
+        }
+
+        binding.removeBtn.setOnClickListener {
+            binding.cytoscapeView.removeNode(binding.idInput.text.toString())
         }
 
     }

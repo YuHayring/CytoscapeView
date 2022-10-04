@@ -190,6 +190,23 @@ class CytoscapeView: WebView {
         bridge.call("add", HashMap(mapData), null)
     }
 
+    /**
+     * remove Node
+     */
+    fun removeNode(node: Node) {
+        val cyNode = SimpleCyNode(node)
+        val tempString = gson.toJson(cyNode)
+        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
+        bridge.call("remove", HashMap(mapData), null)
+    }
+
+    /**
+     * remove Node
+     */
+    fun removeNode(id: String) {
+        bridge.call("remove", HashMap<String, Any>().also{ it["id"] = id }, null)
+    }
+
 
 
 }
