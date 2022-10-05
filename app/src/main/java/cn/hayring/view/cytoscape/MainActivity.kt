@@ -15,6 +15,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.expandSwitch.isChecked = BottomSheetBehavior.from(binding.controlPanel).state == BottomSheetBehavior.STATE_EXPANDED
+
         binding.controlPanel.setOnTouchListener { v, event ->
             v.onTouchEvent(event)
             //collect any event
