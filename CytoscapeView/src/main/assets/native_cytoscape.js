@@ -43,6 +43,30 @@ function init() {
             }
         }
     );
+    bridge.registerHandler('filterNode',
+            function(data, callback) {
+                var elems = cy.nodes().filter(data.param)
+                if (elems == undefined || elems == null || elems.length == 0) {
+                        callback({
+                            result: []
+                        })
+                } else {
+                    if (callback != undefined && callback !== null) {
+                        var array = new Array(elems.length)
+                        for (var i = 0; i < elems.length; i++) {
+                            array[i] = elems[i].data
+                        }
+                        callback({
+                            result: array
+                        })
+                    }
+                }
+            }
+        );
+
+    if (undefined == window.normalPipe) {
+        console.log('window.normalPipe is not available')
+    }
 }
 
 init();

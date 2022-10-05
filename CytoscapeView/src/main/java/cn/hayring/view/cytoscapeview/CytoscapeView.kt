@@ -9,8 +9,16 @@ import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
+import com.housenkui.sdbridgekotlin.Callback
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.runBlocking
 
 
 /**
@@ -114,12 +122,10 @@ class CytoscapeView: WebView {
     /**
      *
      */
-    private val bridge by lazy {
-        WebViewJavascriptBridge(context, this).also {
-            it.consolePipe = object : ConsolePipe {
-                override fun post(string: String) {
-                    Log.d(JS_CONSOLE_TAG, string)
-                }
+    private val bridge = WebViewJavascriptBridge(context, this).also {
+        it.consolePipe = object : ConsolePipe {
+            override fun post(string: String) {
+                Log.d(JS_CONSOLE_TAG, string)
             }
         }
     }
@@ -226,7 +232,20 @@ class CytoscapeView: WebView {
     fun removeElement(id: String) {
         bridge.call("remove", HashMap<String, Any>().also{ it["id"] = id }, null)
     }
+    
+    
 
+    /**
+     * filter Node blocked
+     */
+    fun filterNode(jsSelector: String, callback: (nodes: List<Node>) -> Unit) {
+        bridge.call("filterNode", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback {
+            override fun call(map: HashMap<String, Any>?) {
+                Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
+                callback.invoke(map!!["result"] as List<Node>)
+            }
+        })
+    }
 
 
 }

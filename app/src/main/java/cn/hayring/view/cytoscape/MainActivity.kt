@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.addBtn.setOnClickListener {
-            val node = SimpleNode(binding.idInput.text.toString(), binding.nameOrTargetInput.text.toString())
+            val node = SimpleNode(binding.idInput.text.toString(), binding.paramInput.text.toString())
             binding.cytoscapeView.addNode(node)
         }
 
@@ -26,14 +26,23 @@ class MainActivity : AppCompatActivity() {
             binding.cytoscapeView.addEdge(SimpleEdge(
                 binding.idInput.text.toString(),
                 binding.sourceInput.text.toString(),
-                binding.nameOrTargetInput.text.toString()
+                binding.paramInput.text.toString()
             ))
         }
 
         binding.clear.setOnClickListener {
             binding.idInput.setText("")
             binding.sourceInput.setText("")
-            binding.nameOrTargetInput.setText("")
+            binding.paramInput.setText("")
+        }
+
+        binding.filterNodeBtn.setOnClickListener {
+            binding.cytoscapeView.filterNode(binding.paramInput.text.toString()) {
+                runOnUiThread {
+                    binding.logcat.text = "${binding.logcat.text}\nnode size: ${it.size}"
+                }
+            }
+
         }
 
     }
