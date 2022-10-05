@@ -120,7 +120,9 @@ class CytoscapeView: WebView {
     }
 
     /**
-     *
+     * it must be init at onCreate
+     * beacause it's "setUpBridge" calls addJavascriptInterface
+     * else window.normalPipe would be undefined
      */
     private val bridge = WebViewJavascriptBridge(context, this).also {
         it.consolePipe = object : ConsolePipe {
