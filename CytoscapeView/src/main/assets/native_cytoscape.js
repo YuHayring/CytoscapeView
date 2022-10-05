@@ -64,6 +64,25 @@ function init() {
             }
         );
 
+    bridge.registerHandler('filterEdge',
+                            function(data, callback) {
+                                var elems = cy.edges().filter(data.param)
+                                if (elems == undefined || elems == null || elems.length == 0) {
+                                        callback({
+                                            result: []
+                                        })
+                                } else {
+                                        var array = new Array(elems.length)
+                                        for (var i = 0; i < elems.length; i++) {
+                                            array[i] = elems[i].data
+                                        }
+                                        callback({
+                                            result: array
+                                        })
+                                }
+                            }
+                        );
+
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')
     }

@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.housenkui.sdbridgekotlin.Callback
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
@@ -238,13 +239,33 @@ class CytoscapeView: WebView {
     
 
     /**
-     * filter Node blocked
+     * filter Node
      */
     fun filterNode(jsSelector: String, callback: (nodes: List<Node>) -> Unit) {
         bridge.call("filterNode", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback {
             override fun call(map: HashMap<String, Any>?) {
                 Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
-                callback.invoke(map!!["result"] as List<Node>)
+                //temporarily re-serializable
+                val obj = map!!["result"] as Any
+                val temporarilyJson = gson.toJson(obj)
+                val list = gson.fromJson(temporarilyJson, object: TypeToken<List<Node>>(){}.type) as List<Node>
+                callback.invoke(list)
+            }
+        })
+    }
+
+    /**
+     * filter Node
+     */
+    fun filterEdge(jsSelector: String, callback: (nodes: List<Edge>) -> Unit) {
+        bridge.call("filterEdge", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback {
+            override fun call(map: HashMap<String, Any>?) {
+                Log.d(TAG, "filterEdge callback, thread: ${Thread.currentThread().name}")
+                //temporarily re-serializable
+                val obj = map!!["result"] as Any
+                val temporarilyJson = gson.toJson(obj)
+                val list = gson.fromJson(temporarilyJson, object: TypeToken<List<Edge>>(){}.type) as List<Edge>
+                callback.invoke(list)
             }
         })
     }
