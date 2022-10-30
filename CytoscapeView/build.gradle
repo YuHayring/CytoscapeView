@@ -33,7 +33,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.6.10'
+    implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.0'
     testImplementation 'junit:junit:4.13.2'
@@ -44,7 +44,8 @@ dependencies {
 
 // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.9.1'
-    implementation 'com.github.SDBridge:SDBridgeKotlin:1.0.3'
+//    implementation 'com.github.SDBridge:SDBridgeKotlin:1.0.3'
+    implementation project(":SDBridgeKotlin:SDBridgeKotlin")
 
     // https://mvnrepository.com/artifact/androidx.webkit/webkit
     implementation 'androidx.webkit:webkit:1.5.0'
@@ -53,3 +54,4 @@ dependencies {
 
 
 }
+

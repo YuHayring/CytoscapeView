@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "CytoscapeView"
 include ':app'
 include ':CytoscapeView'
+include ':SDBridgeKotlin:SDBridgeKotlin'

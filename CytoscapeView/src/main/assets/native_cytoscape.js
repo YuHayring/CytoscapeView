@@ -47,18 +47,14 @@ function init() {
             function(data, callback) {
                 var elems = cy.nodes().filter(data.param)
                 if (elems == undefined || elems == null || elems.length == 0) {
-                        callback({
-                            result: []
-                        })
+                        callback([])
                 } else {
                     if (callback != undefined && callback !== null) {
                         var array = new Array(elems.length)
                         for (var i = 0; i < elems.length; i++) {
                             array[i] = elems[i].data
                         }
-                        callback({
-                            result: array
-                        })
+                        callback(array)
                     }
                 }
             }
@@ -68,17 +64,13 @@ function init() {
                             function(data, callback) {
                                 var elems = cy.edges().filter(data.param)
                                 if (elems == undefined || elems == null || elems.length == 0) {
-                                        callback({
-                                            result: []
-                                        })
+                                        callback([])
                                 } else {
                                         var array = new Array(elems.length)
                                         for (var i = 0; i < elems.length; i++) {
                                             array[i] = elems[i].data
                                         }
-                                        callback({
-                                            result: array
-                                        })
+                                        callback(array)
                                 }
                             }
                         );

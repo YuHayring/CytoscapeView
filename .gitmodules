@@ -1,0 +1,3 @@
+[submodule "SDBridgeKotlin"]
+	path = SDBridgeKotlin
+	url = git@github.com:YuHayring/SDBridgeKotlin.git

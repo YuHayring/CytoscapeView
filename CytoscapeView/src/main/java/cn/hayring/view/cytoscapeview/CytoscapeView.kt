@@ -9,17 +9,9 @@ import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.housenkui.sdbridgekotlin.Callback
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
-import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.runBlocking
 
 
 /**
@@ -242,14 +234,10 @@ class CytoscapeView: WebView {
      * filter Node
      */
     fun filterNode(jsSelector: String, callback: (nodes: List<Node>) -> Unit) {
-        bridge.call("filterNode", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback {
-            override fun call(map: HashMap<String, Any>?) {
+        bridge.call("filterNode", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback<List<Node>> {
+            override fun call(p: List<Node>) {
                 Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
-                //temporarily re-serializable
-                val obj = map!!["result"] as Any
-                val temporarilyJson = gson.toJson(obj)
-                val list = gson.fromJson(temporarilyJson, object: TypeToken<List<Node>>(){}.type) as List<Node>
-                callback.invoke(list)
+                callback.invoke(p)
             }
         })
     }
@@ -258,14 +246,10 @@ class CytoscapeView: WebView {
      * filter Node
      */
     fun filterEdge(jsSelector: String, callback: (nodes: List<Edge>) -> Unit) {
-        bridge.call("filterEdge", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback {
-            override fun call(map: HashMap<String, Any>?) {
+        bridge.call("filterEdge", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback<List<Edge>> {
+            override fun call(p: List<Edge>) {
                 Log.d(TAG, "filterEdge callback, thread: ${Thread.currentThread().name}")
-                //temporarily re-serializable
-                val obj = map!!["result"] as Any
-                val temporarilyJson = gson.toJson(obj)
-                val list = gson.fromJson(temporarilyJson, object: TypeToken<List<Edge>>(){}.type) as List<Edge>
-                callback.invoke(list)
+                callback.invoke(p)
             }
         })
     }
