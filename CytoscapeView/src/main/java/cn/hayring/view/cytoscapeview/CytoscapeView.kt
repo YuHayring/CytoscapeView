@@ -304,22 +304,33 @@ class CytoscapeView: WebView {
     /**
      * set on node select listener
      */
-    fun setOnNodeSelectListener(listener: OnNodeEventListener) {
-        nodeEventListeners[CyEvents.select]?:run{
-            bridge.call("addNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
+    fun setOnNodeSelectListener(listener: OnNodeEventListener?) {
+        listener?.let {
+            nodeEventListeners[CyEvents.select]?:run{
+                bridge.call("addNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
+            }
+        }?:run {
+            bridge.call("removeNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
+            nodeEventListeners.remove(CyEvents.select)
         }
-        nodeEventListeners[CyEvents.select] = listener
     }
 
     /**
      * set on edge select listener
      */
-    fun setOnEdgeSelectListener(listener: OnEdgeEventListener) {
-        edgeEventListeners[CyEvents.select]?:run {
-            bridge.call("addEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
+    fun setOnEdgeSelectListener(listener: OnEdgeEventListener?) {
+        listener?.let {
+            edgeEventListeners[CyEvents.select]?:run {
+                bridge.call("addEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
+            }
+            edgeEventListeners[CyEvents.select] = it
+        }?:run {
+            bridge.call("removeEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
+            edgeEventListeners.remove(CyEvents.select)
         }
-        edgeEventListeners[CyEvents.select] = listener
     }
+
+
 
 
 

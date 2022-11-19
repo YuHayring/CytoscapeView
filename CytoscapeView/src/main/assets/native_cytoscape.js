@@ -89,6 +89,13 @@ function init() {
                });
         })
 
+            bridge.registerHandler('removeNodeListener', function(data) {
+                   cy.off(data.event, 'node');
+            })
+
+            bridge.registerHandler('removeEdgeListener', function(data) {
+                       cy.off(data.event, 'node'})
+
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')
     }
