@@ -11,6 +11,7 @@ import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.Callback
 import com.housenkui.sdbridgekotlin.ConsolePipe
+import com.housenkui.sdbridgekotlin.Handler
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
 
 
@@ -123,7 +124,39 @@ class CytoscapeView: WebView {
                 Log.d(JS_CONSOLE_TAG, string)
             }
         }
+        //registe cy event handler
+        it.register("onNodeEvent", onNodeEventHandler)
+        it.register("onEdgeEvent", onEdgeEventHandler)
     }
+
+
+    /**
+     * node event handler
+     */
+    val onNodeEventHandler = object: Handler<NodeEvent, Unit>  {
+        override fun handle(p: NodeEvent) {
+            nodeEventListeners[p.event]?.onEvent(p.node)
+        }
+    }
+
+    /**
+     * node event listeners
+     */
+    val nodeEventListeners = HashMap<CyEvents, OnNodeEventListener>()
+
+    /**
+     * edge event handler
+     */
+    val onEdgeEventHandler = object: Handler<EdgeEvent, Unit>  {
+        override fun handle(p: EdgeEvent) {
+            edgeEventListeners[p.event]?.onEvent(p.edge)
+        }
+    }
+
+    /**
+     * edge event listeners
+     */
+    val edgeEventListeners = HashMap<CyEvents, OnEdgeEventListener>()
 
 //    /**
 //     * https://developer.android.google.cn/reference/kotlin/androidx/webkit/WebViewAssetLoader
@@ -253,6 +286,41 @@ class CytoscapeView: WebView {
             }
         })
     }
+
+    /**
+     * listener to the event of the node
+     */
+    interface OnNodeEventListener {
+        fun onEvent(node: Node)
+    }
+
+    /**
+     * listener to the event of the edge
+     */
+    interface OnEdgeEventListener {
+        fun onEvent(edge: Edge)
+    }
+
+    /**
+     * set on node select listener
+     */
+    fun setOnNodeSelectListener(listener: OnNodeEventListener) {
+        nodeEventListeners[CyEvents.select]?:run{
+            bridge.call("addNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
+        }
+        nodeEventListeners[CyEvents.select] = listener
+    }
+
+    /**
+     * set on edge select listener
+     */
+    fun setOnEdgeSelectListener(listener: OnEdgeEventListener) {
+        edgeEventListeners[CyEvents.select]?:run {
+            bridge.call("addEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
+        }
+        edgeEventListeners[CyEvents.select] = listener
+    }
+
 
 
 }

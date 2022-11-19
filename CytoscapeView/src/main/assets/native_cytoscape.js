@@ -75,6 +75,20 @@ function init() {
                             }
                         );
 
+    bridge.registerHandler('addNodeListener', function(data) {
+           cy.on(data.event, 'node', function(evt){
+             var node = evt.target;
+             bridge.callHandler('onNodeEvent', node)
+           });
+    })
+
+    bridge.registerHandler('addEdgeListener', function(data) {
+               cy.on(data.event, 'node', function(evt){
+                 var edge = evt.target;
+                 bridge.callHandler('onEdgeEvent', edge)
+               });
+        })
+
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')
     }

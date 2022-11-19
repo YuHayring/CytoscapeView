@@ -1,5 +1,11 @@
 package cn.hayring.view.cytoscapeview.bean
 
+import androidx.annotation.StringDef
+import cn.hayring.view.cytoscapeview.bean.CyElement.Companion.EDGES
+import cn.hayring.view.cytoscapeview.bean.CyElement.Companion.NODES
+import cn.hayring.view.cytoscapeview.bean.CyGroup.Companion.EDGE
+import cn.hayring.view.cytoscapeview.bean.CyGroup.Companion.NODE
+
 /**
  * @author Hayring
  * @date 2021/8/22
