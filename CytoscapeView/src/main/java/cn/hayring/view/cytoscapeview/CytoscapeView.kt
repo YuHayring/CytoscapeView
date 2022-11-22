@@ -346,7 +346,12 @@ class CytoscapeView: WebView {
     }
 
 
-
+    /**
+     * reset layout position
+     */
+    fun reset() {
+        bridge.call("reset")
+    }
 
 
 

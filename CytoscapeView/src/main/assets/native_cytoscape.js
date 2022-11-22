@@ -114,6 +114,11 @@ function init() {
         }
     })
 
+    bridge.registerHandler('reset', function () {
+        cy.reset();
+    })
+
+
 
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')
