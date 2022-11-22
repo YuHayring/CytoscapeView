@@ -1,10 +1,12 @@
 package cn.hayring.view.cytoscapeview
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.AttributeSet
+import android.util.Base64
 import android.util.Log
 import android.webkit.*
-import androidx.core.view.isEmpty
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
@@ -14,6 +16,9 @@ import com.housenkui.sdbridgekotlin.Callback
 import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.Handler
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
+import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 /**
@@ -353,6 +358,38 @@ class CytoscapeView: WebView {
         bridge.call("reset")
     }
 
+    /**
+     * get bitmap by cy.png
+     */
+    suspend fun getBitmap(option: ImageOutputOption = ImageOutputOption()): Bitmap? {
+        return suspendCoroutine { continuation ->
+            bridge.call("png", option, object : Callback<String> {
+                override fun call(p: String) {
+                    try {
+                        val decode: ByteArray =
+                            Base64.decode(p.split(",")[1], Base64.DEFAULT)
+                        val bitmap: Bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.size)
+                        continuation.resume(bitmap)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        continuation.resume(null)
+                    }
+                }
+
+            })
+        }
+    }
+
+    /**
+     * get bitmap blocked
+     */
+    fun getBitmapSync(option: ImageOutputOption = ImageOutputOption()): Bitmap? {
+        val bitmap: Bitmap?
+        runBlocking {
+            bitmap = getBitmap(option)
+        }
+        return bitmap
+    }
 
 
 }
