@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
+import androidx.core.view.isEmpty
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
@@ -329,6 +330,21 @@ class CytoscapeView: WebView {
             edgeEventListeners.remove(CyEvents.select)
         }
     }
+
+    /**
+     * change layout position
+     */
+    fun center(vararg args: String) {
+        when (args.size) {
+            0 ->
+                bridge.call("center")
+            1 ->
+                bridge.call("center", args[0])
+            else ->
+                bridge.call("center", args)
+        }
+    }
+
 
 
 

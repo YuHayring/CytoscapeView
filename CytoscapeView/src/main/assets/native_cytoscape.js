@@ -1,9 +1,10 @@
 var cy = cytoscape({
-container: document.getElementById('cytoscape'), // container to render in
-style: [{ selector: 'node',
-        css: {'content': 'data(name)'} //show label with "name" value
+    container: document.getElementById('cytoscape'), // container to render in
+    style: [{
+        selector: 'node',
+        css: { 'content': 'data(name)' } //show label with "name" value
     }],
-//pixelRatio: 0.7,
+    //pixelRatio: 0.7,
 });
 
 
@@ -13,23 +14,23 @@ function init() {
     console.log('initCore')
     const bridge = window.WebViewJavascriptBridge
     console.log(bridge)
-//    bridge.registerHandler('addTest', function(data, responseCallback) {
-//                        cy.add({
-//                             group: 'nodes',
-//                             data: { weight: 75 },
-//                             position: { x: 200, y: 200 }
-//                         });
-//                        //JS gets the data and returns it to the native
-//                        responseCallback(result)
-//                    });
+    //    bridge.registerHandler('addTest', function(data, responseCallback) {
+    //                        cy.add({
+    //                             group: 'nodes',
+    //                             data: { weight: 75 },
+    //                             position: { x: 200, y: 200 }
+    //                         });
+    //                        //JS gets the data and returns it to the native
+    //                        responseCallback(result)
+    //                    });
     bridge.registerHandler('add',
         //https://js.cytoscape.org/#cy.add
-        function(data) {
+        function (data) {
             cy.add(data)
         }
     );
     bridge.registerHandler('remove',
-        function(data, callback) {
+        function (data, callback) {
             var elem = cy.$('#' + data.id)
             if (elem == undefined || elem == null || elem.length == 0) {
                 if (callback != undefined && callback !== null) {
@@ -44,57 +45,75 @@ function init() {
         }
     );
     bridge.registerHandler('filterNode',
-            function(data, callback) {
-                var elems = cy.nodes().filter(data.param)
-                if (elems == undefined || elems == null || elems.length == 0) {
-                        callback([])
-                } else {
-                    if (callback != undefined && callback !== null) {
-                        var array = new Array(elems.length)
-                        for (var i = 0; i < elems.length; i++) {
-                            array[i] = elems[i].data
-                        }
-                        callback(array)
+        function (data, callback) {
+            var elems = cy.nodes().filter(data.param)
+            if (elems == undefined || elems == null || elems.length == 0) {
+                callback([])
+            } else {
+                if (callback != undefined && callback !== null) {
+                    var array = new Array(elems.length)
+                    for (var i = 0; i < elems.length; i++) {
+                        array[i] = elems[i].data
                     }
+                    callback(array)
                 }
             }
-        );
+        }
+    );
 
     bridge.registerHandler('filterEdge',
-                            function(data, callback) {
-                                var elems = cy.edges().filter(data.param)
-                                if (elems == undefined || elems == null || elems.length == 0) {
-                                        callback([])
-                                } else {
-                                        var array = new Array(elems.length)
-                                        for (var i = 0; i < elems.length; i++) {
-                                            array[i] = elems[i].data
-                                        }
-                                        callback(array)
-                                }
-                            }
-                        );
+        function (data, callback) {
+            var elems = cy.edges().filter(data.param)
+            if (elems == undefined || elems == null || elems.length == 0) {
+                callback([])
+            } else {
+                var array = new Array(elems.length)
+                for (var i = 0; i < elems.length; i++) {
+                    array[i] = elems[i].data
+                }
+                callback(array)
+            }
+        }
+    );
 
-    bridge.registerHandler('addNodeListener', function(data) {
-           cy.on(data.event, 'node', function(evt){
-             var node = evt.target;
-             bridge.callHandler('onNodeEvent', node)
-           });
+    bridge.registerHandler('addNodeListener', function (data) {
+        cy.on(data.event, 'node', function (evt) {
+            var node = evt.target;
+            bridge.callHandler('onNodeEvent', node)
+        });
     })
 
-    bridge.registerHandler('addEdgeListener', function(data) {
-               cy.on(data.event, 'node', function(evt){
-                 var edge = evt.target;
-                 bridge.callHandler('onEdgeEvent', edge)
-               });
-        })
+    bridge.registerHandler('addEdgeListener', function (data) {
+        cy.on(data.event, 'node', function (evt) {
+            var edge = evt.target;
+            bridge.callHandler('onEdgeEvent', edge)
+        });
+    })
 
-            bridge.registerHandler('removeNodeListener', function(data) {
-                   cy.off(data.event, 'node');
-            })
+    bridge.registerHandler('removeNodeListener', function (data) {
+        cy.off(data.event, 'node');
+    })
 
-            bridge.registerHandler('removeEdgeListener', function(data) {
-                       cy.off(data.event, 'node'})
+    bridge.registerHandler('removeEdgeListener', function (data) {
+        cy.off(data.event, 'node');
+    })
+
+    bridge.registerHandler('center', function (data) {
+        if (data === undefined) {
+            cy.center()
+        } else if ((typeof data == 'string') && data.constructor == String) {
+            cy.center(cy.$(data))
+        } else {
+            var set = new Set()
+            data.forEach(element => {
+                set.add(cy.$(element))
+            });
+            cy.center(
+                set
+            )
+        }
+    })
+
 
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')
