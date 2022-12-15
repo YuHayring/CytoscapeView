@@ -118,6 +118,10 @@ function init() {
         cy.reset();
     })
 
+    bridge.registerHandler('jsonString', function (data, callback) {
+        callback(JSON.stringify(cy.json()))
+    })
+
 
 
     if (undefined == window.normalPipe) {

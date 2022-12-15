@@ -119,21 +119,6 @@ class CytoscapeView: WebView {
         throw java.lang.UnsupportedOperationException(UNSUPPORTED_SET_CLIENT)
     }
 
-    /**
-     * it must be init at onCreate
-     * beacause it's "setUpBridge" calls addJavascriptInterface
-     * else window.normalPipe would be undefined
-     */
-    private val bridge = WebViewJavascriptBridge(context, this).also {
-        it.consolePipe = object : ConsolePipe {
-            override fun post(string: String) {
-                Log.d(JS_CONSOLE_TAG, string)
-            }
-        }
-        //registe cy event handler
-        it.register("onNodeEvent", onNodeEventHandler)
-        it.register("onEdgeEvent", onEdgeEventHandler)
-    }
 
 
     /**
@@ -163,6 +148,25 @@ class CytoscapeView: WebView {
      * edge event listeners
      */
     val edgeEventListeners = HashMap<CyEvents, OnEdgeEventListener>()
+
+
+    /**
+     * it must be init at onCreate
+     * beacause it's "setUpBridge" calls addJavascriptInterface
+     * else window.normalPipe would be undefined
+     *
+     * bridge must be initialized after initialization of onNodeEventHandler and onEdgeEventHandler
+     */
+    private val bridge = WebViewJavascriptBridge(context, this).also {
+        it.consolePipe = object : ConsolePipe {
+            override fun post(string: String) {
+                Log.d(JS_CONSOLE_TAG, string)
+            }
+        }
+        //registe cy event handler
+        it.register("onNodeEvent", onNodeEventHandler)
+        it.register("onEdgeEvent", onEdgeEventHandler)
+    }
 
 //    /**
 //     * https://developer.android.google.cn/reference/kotlin/androidx/webkit/WebViewAssetLoader
@@ -389,6 +393,32 @@ class CytoscapeView: WebView {
             bitmap = getBitmap(option)
         }
         return bitmap
+    }
+
+    /**
+     * call cy.json get its data as String
+     */
+    suspend fun getCytoscapeJsonDataString(): String {
+        return suspendCoroutine { continuation ->
+            bridge.call("jsonString", object : Callback<String> {
+                override fun call(p: String) {
+                    continuation.resume(p)
+                }
+
+            })
+
+        }
+    }
+
+    /**
+     * call cy.json get its data as String blocked
+     */
+    fun getCytoscapeJsonDataSyncString(): String {
+        val json: String
+        runBlocking {
+            json = getCytoscapeJsonDataSyncString()
+        }
+        return json
     }
 
 

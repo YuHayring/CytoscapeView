@@ -3,8 +3,14 @@ package cn.hayring.view.cytoscape
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import cn.hayring.view.cytoscape.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -73,6 +79,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        }
+
+        binding.jsonBtn.setOnClickListener {
+            lifecycleScope.launch {
+                val json: String
+                withContext(Dispatchers.IO) {
+                    json = binding.cytoscapeView.getCytoscapeJsonDataString()
+                }
+                AlertDialog.Builder(this@MainActivity).setMessage(json).show()
+            }
         }
 
     }
