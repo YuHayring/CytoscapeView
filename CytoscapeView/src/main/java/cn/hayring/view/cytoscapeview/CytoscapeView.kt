@@ -3,6 +3,8 @@ package cn.hayring.view.cytoscapeview
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Base64
 import android.util.Log
@@ -415,9 +417,12 @@ class CytoscapeView: WebView {
      */
     fun getCytoscapeJsonDataSyncString(): String {
         val json: String
+        Log.d(TAG, "getCytoscapeJsonDataSyncString try")
         runBlocking {
-            json = getCytoscapeJsonDataSyncString()
+            Log.d(TAG, "getCytoscapeJsonDataSyncString runBlocking")
+            json = getCytoscapeJsonDataString()
         }
+        Log.d(TAG, "getCytoscapeJsonDataSyncString finished")
         return json
     }
 
