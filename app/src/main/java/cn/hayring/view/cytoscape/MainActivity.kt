@@ -20,6 +20,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        savedInstanceState?:run {
+            binding.cytoscapeView.saveWebState = true
+        }
 
         binding.expandSwitch.isChecked = BottomSheetBehavior.from(binding.controlPanel).state == BottomSheetBehavior.STATE_EXPANDED
 
@@ -84,9 +87,10 @@ class MainActivity : AppCompatActivity() {
         binding.jsonBtn.setOnClickListener {
             lifecycleScope.launch {
                 val json: String
-                withContext(Dispatchers.IO) {
-                    json = binding.cytoscapeView.getCytoscapeJsonDataString()
-                }
+//                withContext(Dispatchers.IO) {
+//                    json = binding.cytoscapeView.getCytoscapeJsonDataString()
+//                }
+                json = binding.cytoscapeView.getCytoscapeJsonDataSyncString()
                 AlertDialog.Builder(this@MainActivity).setMessage(json).show()
             }
         }

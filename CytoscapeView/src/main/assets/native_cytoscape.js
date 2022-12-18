@@ -122,7 +122,11 @@ function init() {
         callback(JSON.stringify(cy.json()))
     })
 
+    bridge.registerHandler('restoreFromJsonString', function(data) {
+        cy.json(JSON.parse(data))
+    })
 
+    bridge.callHandler('onInitialized')
 
     if (undefined == window.normalPipe) {
         console.log('window.normalPipe is not available')

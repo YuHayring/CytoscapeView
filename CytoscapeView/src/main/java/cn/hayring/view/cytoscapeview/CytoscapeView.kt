@@ -133,6 +133,15 @@ class CytoscapeView: WebView {
     }
 
     /**
+     * js initialized callBack handler
+     */
+    val onJavascriptInitialized = object: Handler<Unit, Unit> {
+        override fun handle(p: Unit) {
+            onJsBridgeInitialized()
+        }
+    }
+
+    /**
      * node event listeners
      */
     val nodeEventListeners = HashMap<CyEvents, OnNodeEventListener>()
@@ -168,6 +177,7 @@ class CytoscapeView: WebView {
         //registe cy event handler
         it.register("onNodeEvent", onNodeEventHandler)
         it.register("onEdgeEvent", onEdgeEventHandler)
+        it.register("onInitialized", onJavascriptInitialized)
     }
 
 //    /**
@@ -209,6 +219,26 @@ class CytoscapeView: WebView {
             settings.javaScriptEnabled = true
             super@CytoscapeView.setWebViewClient(webViewClientImplement)
             super@CytoscapeView.loadUrl(CYTOSCAPE_TARGET_URL)
+        }
+
+
+
+        override fun onPause(owner: LifecycleOwner) {
+            super.onPause(owner)
+            try {
+                var start: Long? = null
+                if (BuildConfig.DEBUG) {
+                    start = System.currentTimeMillis()
+                }
+                webState = getCytoscapeJsonDataSyncString()
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "onPause getCytoscapeJsonDataSyncString cost: ${System.currentTimeMillis() - start!!}")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "saveWebState failed")
+                webState = ""
+            }
         }
     }
 
@@ -415,16 +445,104 @@ class CytoscapeView: WebView {
     /**
      * call cy.json get its data as String blocked
      */
-    fun getCytoscapeJsonDataSyncString(): String {
-        val json: String
-        Log.d(TAG, "getCytoscapeJsonDataSyncString try")
-        runBlocking {
-            Log.d(TAG, "getCytoscapeJsonDataSyncString runBlocking")
-            json = getCytoscapeJsonDataString()
+    fun getCytoscapeJsonDataSyncString() = runBlocking {
+        suspendCoroutine { continuation ->
+            bridge.call("jsonString", object : Callback<String> {
+                override fun call(p: String) {
+                    continuation.resume(p)
+                }
+            }, true)
         }
-        Log.d(TAG, "getCytoscapeJsonDataSyncString finished")
-        return json
     }
 
 
+
+    /**
+     * if save WebState with cy.json() at saving Instance State
+     */
+    var saveWebState = false
+
+    /**
+     * saved cy state with cy.json() at saving Instance State
+     */
+    var webState: String? = null
+
+
+    override fun onSaveInstanceState(): Parcelable {
+        val superState = super.onSaveInstanceState()
+        val state = CySavedState(superState!!)
+        if (saveWebState && webState != null) {
+            state.webState = webState
+        }
+        return state
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val cyState: CySavedState = state as CySavedState
+        super.onRestoreInstanceState(cyState.superState)
+        cyState.webState?.let {
+            saveWebState = true
+            if (it != "") {
+                webState = it
+            }
+        }?:run {
+            saveWebState = false
+        }
+
+    }
+
+    /**
+     * js initialized
+     */
+    private fun onJsBridgeInitialized() {
+        webState?.let {
+            bridge.call("restoreFromJsonString", it)
+        }
+    }
+
+
+    class CySavedState: BaseSavedState {
+
+
+        constructor(superState: Parcelable) : super(superState)
+
+        constructor(source: Parcel) : super(source) {
+            webState = source.readString()!!
+        }
+
+        constructor(source: Parcel, loader: ClassLoader?) : super(source, loader) {
+            webState = source.readString()
+        }
+
+
+        var webState: String? = null
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeString(webState)
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<CySavedState> =
+                object : Parcelable.ClassLoaderCreator<CySavedState> {
+                    override fun createFromParcel(`in`: Parcel): CySavedState {
+                        return CySavedState(`in`)
+                    }
+
+                    override fun createFromParcel(`in`: Parcel, loader: ClassLoader): CySavedState {
+                        return CySavedState(`in`, loader)
+                    }
+
+                    override fun newArray(size: Int): Array<CySavedState?> {
+                        return arrayOfNulls(size)
+                    }
+                }
+        }
+
+
+
+
+
+    }
 }
