@@ -259,9 +259,7 @@ class CytoscapeView: WebView {
      */
     fun addNode(node: Node) {
         val cyNode = SimpleCyNode(node)
-        val tempString = gson.toJson(cyNode)
-        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
-        bridge.call("add", HashMap(mapData), null)
+        bridge.call("add", cyNode, null)
     }
 
     /**
@@ -269,9 +267,7 @@ class CytoscapeView: WebView {
      */
     fun addNode(node: Node, position: Position) {
         val cyNode = SimpleCyNode(node, position)
-        val tempString = gson.toJson(cyNode)
-        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
-        bridge.call("add", HashMap(mapData), null)
+        bridge.call("add", cyNode, null)
     }
 
     /**
@@ -279,9 +275,7 @@ class CytoscapeView: WebView {
      */
     fun addEdge(edge: Edge) {
         val cyEdge = SimpleCyEdge(edge)
-        val tempString = gson.toJson(cyEdge)
-        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
-        bridge.call("add", HashMap(mapData), null)
+        bridge.call("add", cyEdge, null)
     }
 
 
@@ -291,16 +285,14 @@ class CytoscapeView: WebView {
      */
     fun removeNode(node: Node) {
         val cyNode = SimpleCyNode(node)
-        val tempString = gson.toJson(cyNode)
-        val mapData = gson.fromJson<Map<String,Any>>(tempString, Map::class.java)
-        bridge.call("remove", HashMap(mapData), null)
+        bridge.call("remove", cyNode, null)
     }
 
     /**
      * remove Node
      */
     fun removeElement(id: String) {
-        bridge.call("remove", HashMap<String, Any>().also{ it["id"] = id }, null)
+        bridge.call("remove", mapOf("id" to id), null)
     }
     
     
@@ -309,7 +301,7 @@ class CytoscapeView: WebView {
      * filter Node
      */
     fun filterNode(jsSelector: String, callback: (nodes: List<Node>) -> Unit) {
-        bridge.call("filterNode", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback<List<Node>> {
+        bridge.call("filterNode", mapOf("param" to jsSelector), object : Callback<List<Node>> {
             override fun call(p: List<Node>) {
                 Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
                 callback.invoke(p)
@@ -321,7 +313,7 @@ class CytoscapeView: WebView {
      * filter Node
      */
     fun filterEdge(jsSelector: String, callback: (nodes: List<Edge>) -> Unit) {
-        bridge.call("filterEdge", HashMap<String, Any>().also{ it["param"] = jsSelector }, object : Callback<List<Edge>> {
+        bridge.call("filterEdge", mapOf("param" to jsSelector), object : Callback<List<Edge>> {
             override fun call(p: List<Edge>) {
                 Log.d(TAG, "filterEdge callback, thread: ${Thread.currentThread().name}")
                 callback.invoke(p)
