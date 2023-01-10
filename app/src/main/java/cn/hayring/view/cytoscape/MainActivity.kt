@@ -115,5 +115,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.centerBtn.setOnClickListener {
+            binding.cytoscapeView.center(binding.idInput.text.toString())
+        }
+
     }
 }
