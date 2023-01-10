@@ -97,7 +97,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+        binding.resetBtn.setOnClickListener{
+            binding.cytoscapeView.reset()
+        }
 
         binding.bitmapBtn.setOnClickListener {
             lifecycleScope.launch {
