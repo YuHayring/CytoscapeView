@@ -98,6 +98,12 @@ function init() {
         cy.off(data.event, 'node');
     })
 
+    bridge.registerHandler('png',
+    function (data, callback) {
+        callback(cy.png(data))
+    }
+);
+
     bridge.registerHandler('center', function (data) {
         if (data === undefined) {
             cy.center()

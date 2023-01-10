@@ -3,6 +3,7 @@ package cn.hayring.view.cytoscapeview
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Looper
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
@@ -343,6 +344,7 @@ class CytoscapeView: WebView {
             nodeEventListeners[CyEvents.select]?:run{
                 bridge.call("addNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
             }
+            nodeEventListeners[CyEvents.select] = it
         }?:run {
             bridge.call("removeNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
             nodeEventListeners.remove(CyEvents.select)
@@ -395,7 +397,7 @@ class CytoscapeView: WebView {
                 override fun call(p: String) {
                     try {
                         val decode: ByteArray =
-                            Base64.decode(p.split(",")[1], Base64.DEFAULT)
+                            Base64.decode(p, Base64.NO_WRAP)
                         val bitmap: Bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.size)
                         continuation.resume(bitmap)
                     } catch (e: Exception) {
@@ -411,12 +413,26 @@ class CytoscapeView: WebView {
     /**
      * get bitmap blocked
      */
-    fun getBitmapSync(option: ImageOutputOption = ImageOutputOption()): Bitmap? {
-        val bitmap: Bitmap?
-        runBlocking {
-            bitmap = getBitmap(option)
+    fun getBitmapSync(option: ImageOutputOption = ImageOutputOption()) = runBlocking {
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            throw IllegalThreadStateException("Could not run on the main thread")
         }
-        return bitmap
+        suspendCoroutine { continuation ->
+            bridge.call("png", option, object : Callback<String> {
+                override fun call(p: String) {
+                    try {
+                        val decode: ByteArray =
+                            Base64.decode(p, Base64.NO_WRAP)
+                        val bitmap: Bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.size)
+                        continuation.resume(bitmap)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        continuation.resume(null)
+                    }
+                }
+
+            }, true)
+        }
     }
 
     /**
@@ -438,6 +454,9 @@ class CytoscapeView: WebView {
      * call cy.json get its data as String blocked
      */
     fun getCytoscapeJsonDataSyncString() = runBlocking {
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            throw IllegalThreadStateException("Could not run on the main thread")
+        }
         suspendCoroutine { continuation ->
             bridge.call("jsonString", object : Callback<String> {
                 override fun call(p: String) {

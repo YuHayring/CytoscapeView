@@ -1,8 +1,10 @@
 package cn.hayring.view.cytoscape
 
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import cn.hayring.view.cytoscape.databinding.ActivityMainBinding
@@ -92,6 +94,22 @@ class MainActivity : AppCompatActivity() {
 //                }
                 json = binding.cytoscapeView.getCytoscapeJsonDataSyncString()
                 AlertDialog.Builder(this@MainActivity).setMessage(json).show()
+            }
+        }
+
+
+
+        binding.bitmapBtn.setOnClickListener {
+            lifecycleScope.launch {
+                val bitmap: Bitmap? = withContext(Dispatchers.Default) {
+                    binding.cytoscapeView.getBitmap()
+                }
+                bitmap?.let {
+                    ImageDialog(this@MainActivity).setBitmap(bitmap).show()
+                }?:run {
+                    Toast.makeText(this@MainActivity, "Bitmap loaded error", Toast.LENGTH_SHORT).show()
+                }
+
             }
         }
 
