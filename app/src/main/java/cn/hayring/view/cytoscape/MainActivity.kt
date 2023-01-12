@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import cn.hayring.view.cytoscape.databinding.ActivityMainBinding
+import cn.hayring.view.cytoscapeview.CytoscapeView
+import cn.hayring.view.cytoscapeview.bean.Edge
+import cn.hayring.view.cytoscapeview.bean.Node
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +28,15 @@ class MainActivity : AppCompatActivity() {
         savedInstanceState?:run {
             binding.cytoscapeView.saveWebState = true
         }
+
+
+        //register adapter
+        binding.cytoscapeView.registerTypeAdapter(
+            listOf(
+                Pair(Node::class.java, SimpleNode.SimpleNodeTypeAdapter),
+                Pair(Edge::class.java, SimpleEdge.SimpleEdgeTypeAdapter)
+            )
+        )
 
         binding.expandSwitch.isChecked = BottomSheetBehavior.from(binding.controlPanel).state == BottomSheetBehavior.STATE_EXPANDED
 
@@ -118,6 +130,23 @@ class MainActivity : AppCompatActivity() {
         binding.centerBtn.setOnClickListener {
             binding.cytoscapeView.center(binding.idInput.text.toString())
         }
+
+        binding.cytoscapeView.onJavascriptInitializedListener = Runnable {
+            binding.cytoscapeView.setOnEdgeSelectListener(object : CytoscapeView.OnEdgeEventListener {
+                override fun onEvent(edge: Edge) {
+                    Toast.makeText(this@MainActivity, "Edge ${edge.id} selected", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+            binding.cytoscapeView.setOnNodeSelectListener(object : CytoscapeView.OnNodeEventListener {
+                override fun onEvent(node: Node) {
+                    Toast.makeText(this@MainActivity, "Node ${node.id} selected", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
+
+
 
     }
 }

@@ -11,6 +11,7 @@ import android.util.Base64
 import android.util.Log
 import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import cn.hayring.view.BuildConfig
 import cn.hayring.view.cytoscapeview.bean.*
@@ -20,6 +21,7 @@ import com.housenkui.sdbridgekotlin.ConsolePipe
 import com.housenkui.sdbridgekotlin.Handler
 import com.housenkui.sdbridgekotlin.WebViewJavascriptBridge
 import kotlinx.coroutines.runBlocking
+import java.lang.reflect.Type
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -133,12 +135,15 @@ class CytoscapeView: WebView {
         }
     }
 
+    var onJavascriptInitializedListener: Runnable? = null
+
     /**
      * js initialized callBack handler
      */
     val onJavascriptInitialized = object: Handler<Unit, Unit> {
         override fun handle(p: Unit) {
             onJsBridgeInitialized()
+            onJavascriptInitializedListener?.run()
         }
     }
 
@@ -175,6 +180,12 @@ class CytoscapeView: WebView {
                 Log.d(JS_CONSOLE_TAG, string)
             }
         }
+        it.registerTypeAdapter(
+            listOf(
+                Pair(NodeEvent::class.java, NodeEventTypeAdapter),
+                Pair(EdgeEvent::class.java, EdgeEventTypeAdapter)
+            )
+        )
         //registe cy event handler
         it.register("onNodeEvent", onNodeEventHandler)
         it.register("onEdgeEvent", onEdgeEventHandler)
@@ -509,6 +520,23 @@ class CytoscapeView: WebView {
         webState?.let {
             bridge.call("restoreFromJsonString", it)
         }
+    }
+
+    /**
+     * register custom adapter at one time
+     */
+    fun registerTypeAdapter(list: Collection<Pair<Type?, Any?>>) {
+        if ((context as LifecycleOwner).lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            throw IllegalStateException("You must register before starting")
+        }
+        val typeList = ArrayList<Pair<Type?, Any?>>()
+        list.forEach {
+            typeList.add(it)
+        }
+        typeList.add(Pair(NodeEvent::class.java, NodeEventTypeAdapter))
+        typeList.add(Pair(EdgeEvent::class.java, EdgeEventTypeAdapter))
+        bridge.registerTypeAdapter(typeList)
+
     }
 
 

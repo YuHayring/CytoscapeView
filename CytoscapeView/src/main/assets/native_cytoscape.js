@@ -78,15 +78,21 @@ function init() {
 
     bridge.registerHandler('addNodeListener', function (data) {
         cy.on(data.event, 'node', function (evt) {
-            var node = evt.target;
-            bridge.callHandler('onNodeEvent', node)
+            var node = evt.target._private.data;
+            bridge.callHandler('onNodeEvent', {
+                event: evt.type,
+                node: node
+            })
         });
     })
 
     bridge.registerHandler('addEdgeListener', function (data) {
-        cy.on(data.event, 'node', function (evt) {
-            var edge = evt.target;
-            bridge.callHandler('onEdgeEvent', edge)
+        cy.on(data.event, 'edge', function (evt) {
+            var edge = evt.target._private.data;
+            bridge.callHandler('onEdgeEvent', {
+            event: evt.type,
+            edge: edge
+            })
         });
     })
 
@@ -95,7 +101,7 @@ function init() {
     })
 
     bridge.registerHandler('removeEdgeListener', function (data) {
-        cy.off(data.event, 'node');
+        cy.off(data.event, 'edge');
     })
 
     bridge.registerHandler('png',
