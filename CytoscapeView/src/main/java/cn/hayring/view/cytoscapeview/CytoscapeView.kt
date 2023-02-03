@@ -1,6 +1,7 @@
 package cn.hayring.view.cytoscapeview
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Looper
@@ -13,7 +14,6 @@ import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import cn.hayring.view.BuildConfig
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.Callback
@@ -57,8 +57,12 @@ class CytoscapeView: WebView {
     }
 
 
+
+    val DEBUG = context.applicationInfo?.let {
+        (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    }?: false
     init {
-        if (BuildConfig.DEBUG) {
+        if (DEBUG) {
             setWebContentsDebuggingEnabled(true)
         }
     }
@@ -104,6 +108,8 @@ class CytoscapeView: WebView {
         private const val SECURITY_ASSERT_URL_PREFIX = "file:///android_asset"
 
             public const val CYTOSCAPE_TARGET_URL = "$SECURITY_ASSERT_URL_PREFIX/index.html"
+
+
     }
 
     final override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String, String>) {
@@ -239,11 +245,11 @@ class CytoscapeView: WebView {
             super.onPause(owner)
             try {
                 var start: Long? = null
-                if (BuildConfig.DEBUG) {
+                if (DEBUG) {
                     start = System.currentTimeMillis()
                 }
                 webState = getCytoscapeJsonDataSyncString()
-                if (BuildConfig.DEBUG) {
+                if (DEBUG) {
                     Log.d(TAG, "onPause getCytoscapeJsonDataSyncString cost: ${System.currentTimeMillis() - start!!}")
                 }
             } catch (e: Exception) {
