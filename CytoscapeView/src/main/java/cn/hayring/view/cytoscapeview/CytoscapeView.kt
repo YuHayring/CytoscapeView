@@ -14,6 +14,7 @@ import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.Callback
@@ -33,28 +34,20 @@ import kotlin.coroutines.suspendCoroutine
  */
 class CytoscapeView: WebView {
 
-    constructor(context: Context) : super(context) {
-        assertLifeCycleContext(context)
-    }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        assertLifeCycleContext(context)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        assertLifeCycleContext(context)
-    }
+    )
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int,
         defStyleRes: Int
-    ) : super(context, attrs, defStyleAttr, defStyleRes) {
-        assertLifeCycleContext(context)
-    }
+    ) : super(context, attrs, defStyleAttr, defStyleRes)
 
 
 
@@ -68,13 +61,13 @@ class CytoscapeView: WebView {
     }
 
     /**
-     * check if lifecycle supported
+     * attach to lifecycle before any other lifecycleObserver related to this view's onCreate, onStart, onResume
+     * attach to lifecycle after any other lifecycleObserver related to this view's onPause, onStop, onDestroy
+     * activity: use this
+     * fragment: use viewLifecycleOwner.lifecycle
      */
-    private fun assertLifeCycleContext(context: Context) {
-        if (context !is LifecycleOwner) {
-            throw java.lang.UnsupportedOperationException("You must put this view into an Activity implement by LifecycleOwner")
-        }
-        context.lifecycle.addObserver(lifecycleObserver)
+    fun attatchToLifeCycle(lifecycle: Lifecycle) {
+        lifecycle.addObserver(lifecycleObserver)
     }
 
 
@@ -231,7 +224,7 @@ class CytoscapeView: WebView {
     val lifecycleObserver = object : DefaultLifecycleObserver {
 
         override fun onCreate(owner: LifecycleOwner) {
-            super.onCreate(owner)
+            Log.i("CytoscapeLifecycle", "onCreate inner")
             settings.allowFileAccess = false
             settings.allowContentAccess = false
             settings.javaScriptEnabled = true
@@ -242,7 +235,7 @@ class CytoscapeView: WebView {
 
 
         override fun onPause(owner: LifecycleOwner) {
-            super.onPause(owner)
+            Log.i("CytoscapeLifecycle", "onPause inner")
             try {
                 var start: Long? = null
                 if (DEBUG) {
@@ -259,6 +252,9 @@ class CytoscapeView: WebView {
             }
         }
     }
+
+
+
 
     @Deprecated("Only for test")
     fun addTest() {
@@ -471,9 +467,9 @@ class CytoscapeView: WebView {
      * call cy.json get its data as String blocked
      */
     fun getCytoscapeJsonDataSyncString() = runBlocking {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            throw IllegalThreadStateException("Could not run on the main thread")
-        }
+//        if (Looper.getMainLooper() == Looper.myLooper()) {
+//            throw IllegalThreadStateException("Could not run on the main thread")
+//        }
         suspendCoroutine { continuation ->
             bridge.call("jsonString", object : Callback<String> {
                 override fun call(p: String) {
@@ -545,6 +541,17 @@ class CytoscapeView: WebView {
 
     }
 
+
+    /**
+     * restore from json
+     * @param json json data
+     */
+    fun restoreFromJson(json: String) {
+        reset()
+        if (json.isNotEmpty()) {
+            bridge.call("restoreFromJsonString", json)
+        }
+    }
 
     class CySavedState: BaseSavedState {
 
