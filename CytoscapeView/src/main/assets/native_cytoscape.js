@@ -77,6 +77,7 @@ function init() {
     );
 
     bridge.registerHandler('addNodeListener', function (data) {
+        console.log('addNodeListener', data.event)
         cy.on(data.event, 'node', function (evt) {
             var node = evt.target._private.data;
             bridge.callHandler('onNodeEvent', {

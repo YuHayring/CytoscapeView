@@ -5,7 +5,7 @@ package cn.hayring.view.cytoscapeview.bean
  * @author Hayring
  * @description data of the edge
  */
-interface Edge: BaseNode {
+interface BaseEdge: BaseNode {
 
     /**
      * start node id of the edge

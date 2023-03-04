@@ -16,6 +16,6 @@ interface CyEdge : CyElement {
     /**
      * data
      */
-    override var data: Edge
+    override var data: BaseEdge
 
 }

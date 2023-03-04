@@ -6,5 +6,5 @@ package cn.hayring.view.cytoscapeview.bean
  * @description simple cyEdge implement
  */
 class SimpleCyEdge(
-    override var data: Edge
+    override var data: BaseEdge
     ) : CyEdge

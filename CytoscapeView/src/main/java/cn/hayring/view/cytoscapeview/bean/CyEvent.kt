@@ -17,7 +17,7 @@ data class NodeEvent(
 
 data class EdgeEvent(
     override val event: CyEvents,
-    val edge: Edge
+    val edge: BaseEdge
 ): CyEvent(event, CyGroup.EDGE)
 
 object NodeEventTypeAdapter: JsonDeserializer<NodeEvent?> {
@@ -40,7 +40,7 @@ object EdgeEventTypeAdapter: JsonDeserializer<EdgeEvent?> {
         context: JsonDeserializationContext?
     ): EdgeEvent? {
         return json?.asJsonObject?.let {
-            context?.deserialize<Edge>(it["edge"], Edge::class.java)
+            context?.deserialize<BaseEdge>(it["edge"], BaseEdge::class.java)
                 ?.let { edge -> EdgeEvent(CyEvents.valueOf(it["event"].asString), edge) }
         }
     }

@@ -11,6 +11,6 @@ interface BaseNode {
     /**
      * node identify
      */
-    var id: String
+    val id: String
 
 }

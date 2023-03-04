@@ -131,7 +131,7 @@ class CytoscapeView: WebView {
      */
     val onNodeEventHandler = object: Handler<NodeEvent, Unit>  {
         override fun handle(p: NodeEvent) {
-            nodeEventListeners[p.event]?.onEvent(p.node)
+            nodeEventListeners[p.event]?.event(p.node)
         }
     }
 
@@ -150,21 +150,21 @@ class CytoscapeView: WebView {
     /**
      * node event listeners
      */
-    val nodeEventListeners = HashMap<CyEvents, OnNodeEventListener>()
+    val nodeEventListeners = HashMap<CyEvents, OnNodeEventListener<out BaseNode>>()
 
     /**
      * edge event handler
      */
     val onEdgeEventHandler = object: Handler<EdgeEvent, Unit>  {
         override fun handle(p: EdgeEvent) {
-            edgeEventListeners[p.event]?.onEvent(p.edge)
+            edgeEventListeners[p.event]?.event(p.edge)
         }
     }
 
     /**
      * edge event listeners
      */
-    val edgeEventListeners = HashMap<CyEvents, OnEdgeEventListener>()
+    val edgeEventListeners = HashMap<CyEvents, OnEdgeEventListener<out BaseEdge>>()
 
 
     /**
@@ -288,7 +288,7 @@ class CytoscapeView: WebView {
     /**
      * add Edge
      */
-    fun addEdge(edge: Edge) {
+    fun addEdge(edge: BaseEdge) {
         val cyEdge = SimpleCyEdge(edge)
         bridge.call("add", cyEdge, null)
     }
@@ -325,11 +325,26 @@ class CytoscapeView: WebView {
     }
 
     /**
+     * filter node suspend
+     */
+    suspend fun filterNode(jsSelector: String): List<BaseNode> {
+        return suspendCoroutine {
+            bridge.call("filterNode", mapOf("param" to jsSelector), object : Callback<List<BaseNode>> {
+                override fun call(p: List<BaseNode>) {
+                    Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
+                    it.resume(p)
+                }
+            })
+        }
+    }
+
+
+    /**
      * filter Node
      */
-    fun filterEdge(jsSelector: String, callback: (nodes: List<Edge>) -> Unit) {
-        bridge.call("filterEdge", mapOf("param" to jsSelector), object : Callback<List<Edge>> {
-            override fun call(p: List<Edge>) {
+    fun filterEdge(jsSelector: String, callback: (nodes: List<BaseEdge>) -> Unit) {
+        bridge.call("filterEdge", mapOf("param" to jsSelector), object : Callback<List<BaseEdge>> {
+            override fun call(p: List<BaseEdge>) {
                 Log.d(TAG, "filterEdge callback, thread: ${Thread.currentThread().name}")
                 callback.invoke(p)
             }
@@ -339,21 +354,31 @@ class CytoscapeView: WebView {
     /**
      * listener to the event of the node
      */
-    interface OnNodeEventListener {
-        fun onEvent(node: BaseNode)
+    interface OnNodeEventListener<N:BaseNode> {
+
+        fun event(node: BaseNode) {
+            onEvent(node as N)
+        }
+
+        fun onEvent(node: N)
     }
 
     /**
      * listener to the event of the edge
      */
-    interface OnEdgeEventListener {
-        fun onEvent(edge: Edge)
+    interface OnEdgeEventListener<E:BaseEdge> {
+
+        fun event(edge: BaseEdge) {
+            onEvent(edge as E)
+        }
+
+        fun onEvent(edge: E)
     }
 
     /**
      * set on node select listener
      */
-    fun setOnNodeSelectListener(listener: OnNodeEventListener?) {
+    fun setOnNodeSelectListener(listener: OnNodeEventListener<out BaseNode>?) {
         listener?.let {
             nodeEventListeners[CyEvents.select]?:run{
                 bridge.call("addNodeListener", CyEvent(CyEvents.select, CyGroup.NODE))
@@ -368,7 +393,7 @@ class CytoscapeView: WebView {
     /**
      * set on edge select listener
      */
-    fun setOnEdgeSelectListener(listener: OnEdgeEventListener?) {
+    fun setOnEdgeSelectListener(listener: OnEdgeEventListener<out BaseEdge>?) {
         listener?.let {
             edgeEventListeners[CyEvents.select]?:run {
                 bridge.call("addEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
@@ -377,6 +402,40 @@ class CytoscapeView: WebView {
         }?:run {
             bridge.call("removeEdgeListener", CyEvent(CyEvents.select, CyGroup.EDGE))
             edgeEventListeners.remove(CyEvents.select)
+        }
+    }
+
+
+
+
+    /**
+     * set on node event listener
+     */
+    fun setOnNodeEventListener(event: CyEvents, listener: OnNodeEventListener<out BaseNode>?) {
+        listener?.let {
+            nodeEventListeners[event]?:run{
+                bridge.call("addNodeListener", CyEvent(event, CyGroup.NODE))
+            }
+            nodeEventListeners[event] = it
+        }?:run {
+            bridge.call("removeNodeListener", CyEvent(event, CyGroup.NODE))
+            nodeEventListeners.remove(event)
+        }
+    }
+
+
+    /**
+     * set on edge event listener
+     */
+    fun setOnEdgeEventListener(event: CyEvents, listener: OnEdgeEventListener<out BaseEdge>?) {
+        listener?.let {
+            edgeEventListeners[event]?:run{
+                bridge.call("addEdgeListener", CyEvent(event, CyGroup.EDGE))
+            }
+            edgeEventListeners[event] = it
+        }?:run {
+            bridge.call("removeNodeListener", CyEvent(event, CyGroup.EDGE))
+            edgeEventListeners.remove(event)
         }
     }
 
@@ -529,9 +588,9 @@ class CytoscapeView: WebView {
      * register custom adapter at one time
      */
     fun registerTypeAdapter(list: Collection<Pair<Type?, Any?>>) {
-        if ((context as LifecycleOwner).lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            throw IllegalStateException("You must register before starting")
-        }
+//        if ((context as LifecycleOwner).lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+//            throw IllegalStateException("You must register before starting")
+//        }
         val typeList = ArrayList<Pair<Type?, Any?>>()
         list.forEach {
             typeList.add(it)
