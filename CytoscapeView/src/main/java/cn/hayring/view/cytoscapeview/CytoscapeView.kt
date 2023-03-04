@@ -278,6 +278,13 @@ class CytoscapeView: WebView {
     }
 
     /**
+     * update Node
+     */
+    fun updateNode(node: BaseNode) {
+        bridge.call("update", node, null)
+    }
+
+    /**
      * add Node with position
      */
     fun addNode(node: BaseNode, position: Position) {
@@ -294,6 +301,12 @@ class CytoscapeView: WebView {
     }
 
 
+    /**
+     * update Edge
+     */
+    fun updateEdge(edge: BaseEdge) {
+        bridge.call("update", edge, null)
+    }
 
     /**
      * remove Node

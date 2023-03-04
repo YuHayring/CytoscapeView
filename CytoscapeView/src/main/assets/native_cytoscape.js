@@ -29,6 +29,15 @@ function init() {
             cy.add(data)
         }
     );
+
+    bridge.registerHandler('update',
+            //https://js.cytoscape.org/#elem.data
+            function (data) {
+                cy.getElementById(data.id).data(data)
+            }
+        );
+
+
     bridge.registerHandler('remove',
         function (data, callback) {
             var elem = cy.$('#' + data.id)
