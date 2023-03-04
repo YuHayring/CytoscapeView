@@ -142,10 +142,16 @@ class CytoscapeView: WebView {
      */
     val onJavascriptInitialized = object: Handler<Unit, Unit> {
         override fun handle(p: Unit) {
+            isJavaScriptInitialized = true
             onJsBridgeInitialized()
             onJavascriptInitializedListener?.run()
         }
     }
+
+    /**
+     * 是否初始化
+     */
+    var isJavaScriptInitialized = false
 
     /**
      * node event listeners
@@ -251,6 +257,12 @@ class CytoscapeView: WebView {
                 Log.e(TAG, "saveWebState failed")
                 webState = ""
             }
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            //未初始化
+            isJavaScriptInitialized = false
         }
     }
 
