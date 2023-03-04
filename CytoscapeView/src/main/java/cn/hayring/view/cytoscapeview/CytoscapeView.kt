@@ -14,7 +14,6 @@ import android.webkit.*
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
 import cn.hayring.view.cytoscapeview.bean.*
 import com.google.gson.Gson
 import com.housenkui.sdbridgekotlin.Callback
@@ -273,7 +272,7 @@ class CytoscapeView: WebView {
     /**
      * add Node
      */
-    fun addNode(node: Node) {
+    fun addNode(node: BaseNode) {
         val cyNode = SimpleCyNode(node)
         bridge.call("add", cyNode, null)
     }
@@ -281,7 +280,7 @@ class CytoscapeView: WebView {
     /**
      * add Node with position
      */
-    fun addNode(node: Node, position: Position) {
+    fun addNode(node: BaseNode, position: Position) {
         val cyNode = SimpleCyNode(node, position)
         bridge.call("add", cyNode, null)
     }
@@ -299,7 +298,7 @@ class CytoscapeView: WebView {
     /**
      * remove Node
      */
-    fun removeNode(node: Node) {
+    fun removeNode(node: BaseNode) {
         val cyNode = SimpleCyNode(node)
         bridge.call("remove", cyNode, null)
     }
@@ -316,9 +315,9 @@ class CytoscapeView: WebView {
     /**
      * filter Node
      */
-    fun filterNode(jsSelector: String, callback: (nodes: List<Node>) -> Unit) {
-        bridge.call("filterNode", mapOf("param" to jsSelector), object : Callback<List<Node>> {
-            override fun call(p: List<Node>) {
+    fun filterNode(jsSelector: String, callback: (nodes: List<BaseNode>) -> Unit) {
+        bridge.call("filterNode", mapOf("param" to jsSelector), object : Callback<List<BaseNode>> {
+            override fun call(p: List<BaseNode>) {
                 Log.d(TAG, "filterNode callback, thread: ${Thread.currentThread().name}")
                 callback.invoke(p)
             }
@@ -341,7 +340,7 @@ class CytoscapeView: WebView {
      * listener to the event of the node
      */
     interface OnNodeEventListener {
-        fun onEvent(node: Node)
+        fun onEvent(node: BaseNode)
     }
 
     /**

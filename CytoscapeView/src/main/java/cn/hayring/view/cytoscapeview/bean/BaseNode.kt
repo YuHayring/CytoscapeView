@@ -6,7 +6,7 @@ package cn.hayring.view.cytoscapeview.bean
  * @description
  * Data container
  */
-interface Node {
+interface BaseNode {
 
     /**
      * node identify

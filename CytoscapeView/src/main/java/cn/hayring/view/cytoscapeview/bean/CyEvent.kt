@@ -12,7 +12,7 @@ open class CyEvent(
 
 data class NodeEvent(
     override val event: CyEvents,
-    val node: Node
+    val node: BaseNode
 ): CyEvent(event, CyGroup.NODE)
 
 data class EdgeEvent(
@@ -27,7 +27,7 @@ object NodeEventTypeAdapter: JsonDeserializer<NodeEvent?> {
         context: JsonDeserializationContext?
     ): NodeEvent? {
         return json?.asJsonObject?.let {
-            context?.deserialize<Node>(it["node"], Node::class.java)
+            context?.deserialize<BaseNode>(it["node"], BaseNode::class.java)
                 ?.let { node -> NodeEvent(CyEvents.valueOf(it["event"].asString), node) }
         }
     }
