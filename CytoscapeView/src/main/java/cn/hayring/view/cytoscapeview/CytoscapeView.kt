@@ -58,6 +58,8 @@ class CytoscapeView: WebView {
         if (DEBUG) {
             setWebContentsDebuggingEnabled(true)
         }
+        isVerticalScrollBarEnabled = false
+        isHorizontalScrollBarEnabled = false
     }
 
     /**
