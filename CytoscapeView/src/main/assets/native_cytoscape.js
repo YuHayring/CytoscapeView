@@ -148,6 +148,23 @@ function init() {
         cy.json(JSON.parse(data))
     })
 
+    bridge.registerHandler('select', function(data) {
+        cy.$('#'+data).select()
+    })
+
+    bridge.registerHandler('unselect', function(data) {
+        cy.$('#'+data).unselect()
+    })
+
+
+    bridge.registerHandler('selectifyAllNodes', function(){
+        cy.nodes().selectify()
+    })
+
+    bridge.registerHandler('unselectifyAllNodes', function(){
+        cy.nodes().unselectify()
+    })
+
     bridge.callHandler('onInitialized')
 
     if (undefined == window.normalPipe) {

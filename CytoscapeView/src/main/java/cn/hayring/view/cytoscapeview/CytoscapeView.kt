@@ -486,6 +486,33 @@ class CytoscapeView: WebView {
         bridge.call("reset")
     }
 
+    fun select(id: String) {
+        bridge.call("select", id)
+    }
+
+    fun unselect(id: String) {
+        bridge.call("unselect", id)
+    }
+
+
+    /**
+     * make all node selectable
+     */
+    fun selectifyAllNodes() {
+        bridge.call("selectifyAllNodes")
+    }
+
+    /**
+     * make all node unselectable
+     */
+    fun unselectifyAllNodes() {
+        bridge.call("unselectifyAllNodes")
+    }
+
+
+
+
+
     /**
      * get bitmap by cy.png
      */
@@ -676,10 +703,5 @@ class CytoscapeView: WebView {
                     }
                 }
         }
-
-
-
-
-
     }
 }
