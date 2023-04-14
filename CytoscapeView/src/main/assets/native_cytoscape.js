@@ -3,7 +3,12 @@ var cy = cytoscape({
     style: [{
         selector: 'node',
         css: { 'content': 'data(name)' } //show label with "name" value
-    }],
+    },
+    {
+            selector: 'edge',
+            css: { 'content': 'data(name)' } //show label with "name" value
+        }
+    ],
     //pixelRatio: 0.7,
 });
 

@@ -13,4 +13,9 @@ interface BaseNode {
      */
     val id: String
 
+    /**
+     * showing text at cytoscape
+     */
+    val name: String
+
 }
