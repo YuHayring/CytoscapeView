@@ -665,6 +665,34 @@ class CytoscapeView: WebView {
         }
     }
 
+    /**
+     * get all Edges of the node
+     */
+    suspend fun getLinkedEdges(id: String): List<BaseEdge> {
+        return suspendCoroutine {
+            bridge.call("connectedEdges", id, object : Callback<List<BaseEdge>> {
+                override fun call(p: List<BaseEdge>) {
+                    Log.d(TAG, "getLinkedEdges callback, thread: ${Thread.currentThread().name}")
+                    it.resume(p)
+                }
+            })
+        }
+    }
+
+    /**
+     * get nodes between the edge
+     */
+    suspend fun getLinkedNodes(id: String): List<BaseNode> {
+        return suspendCoroutine {
+            bridge.call("connectedNodes", id, object : Callback<List<BaseNode>> {
+                override fun call(p: List<BaseNode>) {
+                    Log.d(TAG, "getLinkedNodes callback, thread: ${Thread.currentThread().name}")
+                    it.resume(p)
+                }
+            })
+        }
+    }
+
     class CySavedState: BaseSavedState {
 
 
